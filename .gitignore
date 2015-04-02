@@ -1,0 +1,10 @@
+*.a
+*.so
+*.so.*
+*.o
+*~
+config.h
+Makefile.local
+__pycache__
+*.pyc
+*.pyo
