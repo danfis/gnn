@@ -1,0 +1,96 @@
+#BASEPATH_ := $(dir $(realpath $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST))))
+BASEPATH_ := $(dir $(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
+
+CC ?= gcc
+CXX ?= g++
+M4 ?= m4
+SCAN_BUILD ?= scan-build
+PROTOC ?= protoc
+PYTHON2 ?= python2
+
+SYSTEM = $(shell uname)
+
+SYSTEM_CXXFLAGS =
+SYSTEM_LDFLAGS =
+CONFIG_FLAGS =
+
+ifeq '$(SYSTEM)' 'FreeBSD'
+  SYSTEM_CXXFLAGS = -Wno-long-long
+else
+endif
+
+DEBUG ?= no
+PROFIL ?= no
+WERROR ?= no
+
+ifeq '$(PROFIL)' 'yes'
+  DEBUG = yes
+endif
+
+ifeq '$(DEBUG)' 'yes'
+  CFLAGS = -g -Wno-unused-function
+  CXXFLAGS = -g -Wno-unused-function
+  CONFIG_FLAGS += -DDEBUG
+else
+  # force to use optimizations
+  CFLAGS += -O3
+  CXXFLAGS += -O3
+endif
+ifeq '$(PROFIL)' 'yes'
+  CFLAGS += -pg
+  CXXFLAGS += -pg
+endif
+CFLAGS += -Wall -pedantic --std=gnu99
+CXXFLAGS += -Wall -pedantic
+
+ifeq '$(WERROR)' 'yes'
+  CFLAGS += -Werror
+endif
+
+LDFLAGS += -pthread
+LDFLAGS += $(SYSTEM_LDFLAGS)
+
+OPTS_CFLAGS ?=
+OPTS_LDFLGS ?=
+USE_LOCAL_OPTS ?= $(shell if test -f $(BASEPATH_)/third-party/opts/libopts.a; then echo "yes"; else echo "no"; fi;)
+ifeq '$(USE_LOCAL_OPTS)' 'yes'
+  OPTS_CFLAGS := -I$(BASEPATH_)/third-party/opts
+  OPTS_LDFLAGS := -L$(BASEPATH_)/third-party/opts -lopts
+endif
+
+BORUVKA_CFLAGS ?=
+BORUVKA_LDFLAGS ?=
+USE_LOCAL_BORUVKA ?= $(shell if test -f $(BASEPATH_)/third-party/boruvka/libboruvka.a; then echo "yes"; else echo "no"; fi;)
+ifeq '$(USE_LOCAL_BORUVKA)' 'yes'
+  BORUVKA_CFLAGS := -I$(BASEPATH_)/third-party/boruvka
+  BORUVKA_LDFLAGS := -L$(BASEPATH_)/third-party/boruvka -lboruvka
+endif
+
+NANOMSG_PATH_ := $(BASEPATH_)/third-party/nanomsg
+NANOMSG_LIBPATH_ := $(NANOMSG_PATH_)/build/lib
+USE_LOCAL_NANOMSG ?= $(shell if test -f $(NANOMSG_LIBPATH_)/libnanomsg.a; then echo "yes"; else echo "no"; fi;)
+ifeq '$(USE_LOCAL_NANOMSG)' 'yes'
+  NANOMSG_CFLAGS ?= $(shell PKG_CONFIG_PATH=$(NANOMSG_LIBPATH_)/pkgconfig pkg-config --cflags libnanomsg)
+  NANOMSG_LDFLAGS ?= $(shell PKG_CONFIG_PATH=$(NANOMSG_LIBPATH_)/pkgconfig pkg-config --libs libnanomsg)
+#  NANOMSG_CFLAGS := -I$(NANOMSG_PATH_)/build/include
+#  NANOMSG_LDFLAGS := -L$(NANOMSG_PATH_)/build/lib -lnanomsg -lanl -lrt
+else
+  NANOMSG_CFLAGS ?= $(shell pkg-config --cflags libnanomsg)
+  NANOMSG_LDFLAGS ?= $(shell pkg-config --libs libnanomsg)
+endif
+
+PROTOBUF_PATH_ := $(BASEPATH_)/third-party/protobuf
+PROTOBUF_LIBPATH_ := $(PROTOBUF_PATH_)/build/lib
+USE_LOCAL_PROTOBUF ?= $(shell if test -f $(PROTOBUF_LIBPATH_)/libprotobuf.a; then echo "yes"; else echo "no"; fi;)
+ifeq '$(USE_LOCAL_PROTOBUF)' 'yes'
+  PROTOBUF_CFLAGS ?= $(shell PKG_CONFIG_PATH=$(PROTOBUF_LIBPATH_)/pkgconfig pkg-config --cflags protobuf)
+  PROTOBUF_LDFLAGS ?= $(shell PKG_CONFIG_PATH=$(PROTOBUF_LIBPATH_)/pkgconfig pkg-config --libs protobuf)
+#  PROTOBUF_CFLAGS := -I$(PROTOBUF_PATH_)/build/include
+#  PROTOBUF_LDFLAGS := -L$(PROTOBUF_PATH_)/build/lib -lprotobuf
+  PROTOC := $(realpath $(PROTOBUF_PATH_))/build/bin/protoc
+else
+  PROTOBUF_CFLAGS ?= $(shell pkg-config --cflags protobuf)
+  PROTOBUF_LDFLAGS ?= $(shell pkg-config --libs protobuf)
+endif
+
+.DEFAULT_GOAL := all
