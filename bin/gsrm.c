@@ -161,28 +161,50 @@ static void readOptions(int argc, char *argv[])
     params.nn.gug.max_dens = 0.1;
     params.nn.gug.expand_rate = 1.5;
 
-    optsAdd("help",             'h', OPTS_NONE,  NULL, OPTS_CB(optHelp));
-    optsAdd("verbose",          'v', OPTS_NONE,  NULL, OPTS_CB(optIncVerbosity));
-    optsAdd("epsilon-n",         0, OPTS_REAL,   (void *)&params.en, NULL);
-    optsAdd("epsilon-b",         0, OPTS_REAL,   (void *)&params.eb, NULL);
-    optsAdd("lambda",            0, OPTS_SIZE_T, (void *)&params.lambda, NULL);
-    optsAdd("beta",              0, OPTS_REAL,   (void *)&params.beta, NULL);
-    optsAdd("alpha",             0, OPTS_REAL,   (void *)&params.alpha, NULL);
-    optsAdd("age-max",           0, OPTS_INT,    (void *)&params.age_max, NULL);
-    optsAdd("max-nodes",         0, OPTS_SIZE_T, (void *)&params.max_nodes, NULL);
-    optsAdd("min-dangle",        0, OPTS_REAL,   (void *)&params.min_dangle, NULL);
-    optsAdd("max-angle",         0, OPTS_REAL,   (void *)&params.max_angle, NULL);
-    optsAdd("angle-merge-edges", 0, OPTS_REAL,   (void *)&params.angle_merge_edges, NULL);
-    optsAdd("dump-triangles",    0, OPTS_STR,    NULL, OPTS_CB(optDumpTriangles));
-    optsAdd("nn-gug",            0, OPTS_NONE,   NULL, OPTS_CB(optNN));
-    optsAdd("nn-vptree",         0, OPTS_NONE,   NULL, OPTS_CB(optNN));
-    optsAdd("nn-linear",         0, OPTS_NONE,   NULL, OPTS_CB(optNN));
-    optsAdd("vptree-max-size",   0, OPTS_INT,    (void *)&params.nn.vptree.maxsize, NULL);
-    optsAdd("gug-max-dens",      0, OPTS_REAL,   (void *)&params.nn.gug.max_dens, NULL);
-    optsAdd("gug-expand-rate",   0, OPTS_REAL,   (void *)&params.nn.gug.expand_rate, NULL);
-    optsAdd("unoptimized-err",   0, OPTS_NONE,   (void *)&params.unoptimized_err, NULL);
-    optsAdd("no-postprocess",    0, OPTS_NONE,   (void *)&no_postprocess, NULL);
-    optsAdd("output",           'o', OPTS_STR,   NULL, OPTS_CB(optOutput));
+    optsAddDesc("help", 'h', OPTS_NONE, NULL, OPTS_CB(optHelp),
+                "Prints this help.");
+    optsAddDesc("verbose", 'v', OPTS_NONE, NULL, OPTS_CB(optIncVerbosity),
+                "Increases verbosity level.");
+    optsAddDesc("epsilon-b", 0, OPTS_REAL, (void *)&params.eb, NULL,
+                "Winner's learning rate.");
+    optsAddDesc("epsilon-n", 0, OPTS_REAL, (void *)&params.en, NULL,
+                "Winner's neighbors learning rate.");
+    optsAddDesc("lambda", 0, OPTS_SIZE_T, (void *)&params.lambda, NULL,
+                "Steps in a cycle.");
+    optsAddDesc("beta", 0, OPTS_REAL, (void *)&params.beta, NULL,
+                "Error counter decreasing rate.");
+    optsAddDesc("alpha", 0, OPTS_REAL, (void *)&params.alpha, NULL,
+                "Error counter decreasing rate.");
+    optsAddDesc("age-max", 0, OPTS_INT, (void *)&params.age_max, NULL,
+                "");
+    optsAddDesc("max-nodes", 0, OPTS_SIZE_T, (void *)&params.max_nodes, NULL,
+                "Stopping criterion.");
+    optsAddDesc("min-dangle", 0, OPTS_REAL, (void *)&params.min_dangle, NULL,
+                "Minimal dihedral angle between faces");
+    optsAddDesc("max-angle", 0, OPTS_REAL,(void *)&params.max_angle, NULL,
+                "Maximal angle in cusp of face");
+    optsAddDesc("angle-merge-edges", 0, OPTS_REAL, (void *)&params.angle_merge_edges, NULL,
+                "Minimal angle between edges to merge them\n");
+    optsAddDesc("nn-gug", 0, OPTS_NONE, NULL, OPTS_CB(optNN),
+                "Use Growing Uniform Grid for NN search (default)");
+    optsAddDesc("nn-vptree", 0, OPTS_NONE, NULL, OPTS_CB(optNN),
+                "Use VP-Tree for NN search");
+    optsAddDesc("nn-linear", 0, OPTS_NONE, NULL, OPTS_CB(optNN),
+                "Use linear NN search");
+    optsAddDesc("vptree-max-size", 0, OPTS_INT, (void *)&params.nn.vptree.maxsize, NULL,
+                "Maximal number of elements in leaf node");
+    optsAddDesc("gug-max-dens", 0, OPTS_REAL, (void *)&params.nn.gug.max_dens, NULL,
+                "Maximal density");
+    optsAddDesc("gug-expand-rate", 0, OPTS_REAL, (void *)&params.nn.gug.expand_rate, NULL,
+                "Expand rate\n");
+    optsAddDesc("unoptimized-err", 0, OPTS_NONE, (void *)&params.unoptimized_err, NULL,
+                "Turn off optimization of error handling");
+    optsAddDesc("no-postprocess", 0, OPTS_NONE, (void *)&no_postprocess, NULL,
+                "Turn off postprocessing.\n");
+    optsAddDesc("output", 'o', OPTS_STR, NULL, OPTS_CB(optOutput),
+                "Path to an output file.");
+    optsAddDesc("dump-triangles", 0, OPTS_STR, NULL, OPTS_CB(optDumpTriangles),
+                "Path to a file where will be stored triangles from the reconstructed object.");
 
     if (opts(&argc, argv) != 0){
         usage(argc, argv, NULL);
@@ -209,35 +231,8 @@ static void usage(int argc, char *argv[], const char *opt_msg)
 
     fprintf(stderr, "\n");
     fprintf(stderr, "Usage %s [ options ] filename\n", argv[0]);
-    fprintf(stderr, "   Options: --epsilon-b float  Winner learning rate\n");
-    fprintf(stderr, "            --epsilon-n float  Winner's neighbors learning rate\n");
-    fprintf(stderr, "            --lambda    int    Steps in cycle\n");
-    fprintf(stderr, "            --beta      float  Error counter decreasing rate\n");
-    fprintf(stderr, "            --alpha     float  Error counter decreasing rate\n");
-    fprintf(stderr, "            --age-max   int\n");
-    fprintf(stderr, "            --max-nodes int    Stop Criterium\n");
-    fprintf(stderr, "\n");
-    fprintf(stderr, "            --min-dangle        float  Minimal dihedral angle between faces\n");
-    fprintf(stderr, "            --max-angle         float  Maximal angle in cusp of face\n");
-    fprintf(stderr, "            --angle-merge-edges float  Minimal angle between edges to merge them\n");
-    fprintf(stderr, "\n");
-    fprintf(stderr, "            --unoptimized-err   Turn off optimization of error handling\n");
-    fprintf(stderr, "            --no-postprocess    Turn off postprocessing\n");
-    fprintf(stderr, "\n");
-    fprintf(stderr, "            --nn-gug                  Use Growing Uniform Grid for NN search (default choise)\n");
-    fprintf(stderr, "            --nn-vptree               Use VP-Tree for NN search\n");
-    fprintf(stderr, "            --nn-linear               Use linear NN search\n");
-    fprintf(stderr, "            --vptree-max-size  int    Maximal number of elements in leaf node\n");
-    fprintf(stderr, "            --gug-max-dens     float  Maximal density\n");
-    fprintf(stderr, "            --gug-expand-rate  float  Expand rate\n");
-    fprintf(stderr, "\n");
-
-    fprintf(stderr, "\n");
-
-    fprintf(stderr, "            --outfile / -o   filename Filename where will be dumped resulting mesh (stdout is default)\n");
-    fprintf(stderr, "            --dump-triangles filename Filename where will be stored triangles from reconstructed object.\n");
-    fprintf(stderr, "\n");
-    fprintf(stderr, "            -v / -vv / ...  Increases verbosity\n");
+    fprintf(stderr, "  OPTIONS:\n");
+    optsPrint(stderr, "    ");
     fprintf(stderr, "\n");
 
     exit(-1);
