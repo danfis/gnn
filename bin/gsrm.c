@@ -27,8 +27,8 @@
 
 
 #define DUMP_TRIANGLES_FN_LEN 100
-static bor_gsrm_params_t params;
-static bor_gsrm_t *gsrm;
+static gnn_gsrm_params_t params;
+static gnn_gsrm_t *gsrm;
 static const char *is_fn = NULL;
 static const char *outfile_fn;
 static FILE *dump_triangles = NULL;
@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 
     readOptions(argc, argv);
 
-    gsrm = borGSRMNew(&params);
+    gsrm = gnnGSRMNew(&params);
 
     printAttrs();
 
@@ -69,17 +69,17 @@ int main(int argc, char *argv[])
     borTimerStart(&timer);
     borTimerStopAndPrintElapsed(&timer, stderr, " Reading input signals:\n");
     borTimerStopAndPrintElapsed(&timer, stderr, "   -- '%s'...\n", is_fn);
-    islen = borGSRMAddInputSignals(gsrm, is_fn);
+    islen = gnnGSRMAddInputSignals(gsrm, is_fn);
     borTimerStopAndPrintElapsed(&timer, stderr, "     --  Added %d input signals.\n", islen);
     fprintf(stderr, "\n");
 
-    if (borGSRMRun(gsrm) == 0){
+    if (gnnGSRMRun(gsrm) == 0){
         if (!no_postprocess)
-            borGSRMPostprocess(gsrm);
+            gnnGSRMPostprocess(gsrm);
 
         borTimerStart(&timer);
 
-        mesh = borGSRMMesh(gsrm);
+        mesh = gnnGSRMMesh(gsrm);
         borMesh3DumpSVT(mesh, outfile, "Result");
 
         if (params.verbosity >= 2){
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    borGSRMDel(gsrm);
+    gnnGSRMDel(gsrm);
 
 
     // close output file
@@ -155,7 +155,7 @@ static void readOptions(int argc, char *argv[])
     pargc = argc;
     pargv = argv;
 
-    borGSRMParamsInit(&params);
+    gnnGSRMParamsInit(&params);
     params.verbosity = 1;
     params.nn.gug.num_cells = 0;
     params.nn.gug.max_dens = 0.1;
@@ -245,9 +245,9 @@ static void usage(int argc, char *argv[], const char *opt_msg)
 
 void printAttrs(void)
 {
-    const bor_gsrm_params_t *param;
+    const gnn_gsrm_params_t *param;
 
-    param = borGSRMParams(gsrm);
+    param = gnnGSRMParams(gsrm);
 
     fprintf(stderr, "Attributes:\n");
     fprintf(stderr, "    lambda:    %d\n", (int)param->lambda);

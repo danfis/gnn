@@ -63,7 +63,7 @@ struct _face_t {
 };
 typedef struct _face_t face_t;
 
-struct _bor_gsrm_cache_t {
+struct _gnn_gsrm_cache_t {
     bor_vec3_t *is;     /*!< Input signal */
     node_t *nearest[2]; /*!< Two nearest nodes */
 
@@ -80,143 +80,143 @@ struct _bor_gsrm_cache_t {
     bor_real_t pp_min, pp_max; /*!< Min and max area2 of face - used in
                                     postprocessing */
 };
-typedef struct _bor_gsrm_cache_t bor_gsrm_cache_t;
+typedef struct _gnn_gsrm_cache_t gnn_gsrm_cache_t;
 
 
 /** Allocates and deallocates cache */
-static bor_gsrm_cache_t *cacheNew(void);
-static void cacheDel(bor_gsrm_cache_t *c);
+static gnn_gsrm_cache_t *cacheNew(void);
+static void cacheDel(gnn_gsrm_cache_t *c);
 
 
 /** --- Node functions --- */
 /** Creates new node and sets its weight to given vector */
-static node_t *nodeNew(bor_gsrm_t *g, const bor_vec3_t *v);
+static node_t *nodeNew(gnn_gsrm_t *g, const bor_vec3_t *v);
 /** Deletes node */
-static void nodeDel(bor_gsrm_t *g, node_t *n);
+static void nodeDel(gnn_gsrm_t *g, node_t *n);
 /** Deletes node - proposed for borMesh3Del2() function */
 static void nodeDel2(bor_mesh3_vertex_t *v, void *data);
 /** Fixes node's error counter, i.e. applies correct beta^(n * lambda) */
-_bor_inline void nodeFixError(bor_gsrm_t *gng, node_t *n);
+_bor_inline void nodeFixError(gnn_gsrm_t *gng, node_t *n);
 /** Increment error counter */
-_bor_inline void nodeIncError(bor_gsrm_t *gng, node_t *n, bor_real_t inc);
+_bor_inline void nodeIncError(gnn_gsrm_t *gng, node_t *n, bor_real_t inc);
 /** Scales error counter */
-_bor_inline void nodeScaleError(bor_gsrm_t *gng, node_t *n, bor_real_t scale);
+_bor_inline void nodeScaleError(gnn_gsrm_t *gng, node_t *n, bor_real_t scale);
 
 
 /** --- Edge functions --- */
 /** Creates new edge as connection between two given nodes */
-static edge_t *edgeNew(bor_gsrm_t *g, node_t *n1, node_t *n2);
+static edge_t *edgeNew(gnn_gsrm_t *g, node_t *n1, node_t *n2);
 /** Deletes edge */
-static void edgeDel(bor_gsrm_t *g, edge_t *e);
+static void edgeDel(gnn_gsrm_t *g, edge_t *e);
 /** Deteles edge - proposed for borMesh3Del2() function */
 static void edgeDel2(bor_mesh3_edge_t *v, void *data);
 
 /** --- Face functions --- */
-static face_t *faceNew(bor_gsrm_t *g, edge_t *e, node_t *n);
-static void faceDel(bor_gsrm_t *g, face_t *e);
+static face_t *faceNew(gnn_gsrm_t *g, edge_t *e, node_t *n);
+static void faceDel(gnn_gsrm_t *g, face_t *e);
 static void faceDel2(bor_mesh3_face_t *v, void *data);
 
 
-static int init(bor_gsrm_t *g);
-static void adapt(bor_gsrm_t *g);
-static void newNode(bor_gsrm_t *g);
+static int init(gnn_gsrm_t *g);
+static void adapt(gnn_gsrm_t *g);
+static void newNode(gnn_gsrm_t *g);
 
 /* Initializes mesh with three random nodes from input */
-static void meshInit(bor_gsrm_t *g);
+static void meshInit(gnn_gsrm_t *g);
 
-static void drawInputPoint(bor_gsrm_t *g);
+static void drawInputPoint(gnn_gsrm_t *g);
 /** Performes Extended Competitive Hebbian Learning */
-static void echl(bor_gsrm_t *g);
-static void echlConnectNodes(bor_gsrm_t *g);
-static void echlMove(bor_gsrm_t *g);
-static void echlUpdate(bor_gsrm_t *g);
+static void echl(gnn_gsrm_t *g);
+static void echlConnectNodes(gnn_gsrm_t *g);
+static void echlMove(gnn_gsrm_t *g);
+static void echlUpdate(gnn_gsrm_t *g);
 /** Creates new node */
-static void createNewNode(bor_gsrm_t *g);
+static void createNewNode(gnn_gsrm_t *g);
 
 /** Initializes mesh with three random nodes from input */
-static void meshInit(bor_gsrm_t *g);
+static void meshInit(gnn_gsrm_t *g);
 /** Choose random input signal and stores it in cache */
-static void drawInputPoint(bor_gsrm_t *g);
+static void drawInputPoint(gnn_gsrm_t *g);
 
 
 /** --- ECHL functions --- */
 /** Performs ECHL algorithm */
-static void echl(bor_gsrm_t *g);
+static void echl(gnn_gsrm_t *g);
 /** Gathers common neighbors of n1 and n2 and stores them in cache. */
-static void echlCommonNeighbors(bor_gsrm_t *g, node_t *n1, node_t *n2);
+static void echlCommonNeighbors(gnn_gsrm_t *g, node_t *n1, node_t *n2);
 /** Remove edge if it is inside thales sphere of n1, n2 and theirs common
  *  neighbors */
-static void echlRemoveThales(bor_gsrm_t *g, edge_t *e, node_t *n1, node_t *n2);
+static void echlRemoveThales(gnn_gsrm_t *g, edge_t *e, node_t *n1, node_t *n2);
 /** Removes all edges that connect common neighbors between each other */
-static void echlRemoveNeighborsEdges(bor_gsrm_t *g);
+static void echlRemoveNeighborsEdges(gnn_gsrm_t *g);
 /** Create faces between given edge and common neighbors stored in cache's
  *  .common_neighb array */
-static void echlCreateFaces(bor_gsrm_t *g, edge_t *e);
+static void echlCreateFaces(gnn_gsrm_t *g, edge_t *e);
 /** Connect winner nodes and if they are already connected update that
  *  connection */
-static void echlConnectNodes(bor_gsrm_t *g);
+static void echlConnectNodes(gnn_gsrm_t *g);
 /** Moves node towards input signal by given factor */
-_bor_inline void echlMoveNode(bor_gsrm_t *g, node_t *n, bor_real_t k);
+_bor_inline void echlMoveNode(gnn_gsrm_t *g, node_t *n, bor_real_t k);
 /** Move winner nodes towards input signal */
-static void echlMove(bor_gsrm_t *g);
+static void echlMove(gnn_gsrm_t *g);
 /** Updates all edges emitating from winning node */
-static void echlUpdate(bor_gsrm_t *g);
+static void echlUpdate(gnn_gsrm_t *g);
 
 
 /** -- Create New Node functions --- */
 /** Performs "Create New Node" operation */
-static void createNewNode(bor_gsrm_t *g);
+static void createNewNode(gnn_gsrm_t *g);
 /** Returns node with highest error counter */
-static node_t *nodeWithHighestErrCounter(bor_gsrm_t *g);
+static node_t *nodeWithHighestErrCounter(gnn_gsrm_t *g);
 /** Returns node with highests error counter that is neighbor of sq */
-static node_t *nodesNeighborWithHighestErrCounter(bor_gsrm_t *g, node_t *sq);
+static node_t *nodesNeighborWithHighestErrCounter(gnn_gsrm_t *g, node_t *sq);
 /** Actually creates new node between sq and sf */
-static node_t *createNewNode2(bor_gsrm_t *g, node_t *sq, node_t *sf);
+static node_t *createNewNode2(gnn_gsrm_t *g, node_t *sq, node_t *sf);
 
 
 /** --- Topology learning --- */
-static void learnTopology(bor_gsrm_t *g);
+static void learnTopology(gnn_gsrm_t *g);
 
 
 /** --- Postprocessing functions --- */
 /** Returns (via min, max, avg arguments) minimum, maximum and average area
  *  of faces in a mesh. */
-static void faceAreaStat(bor_gsrm_t *g, bor_real_t *min, bor_real_t *max,
+static void faceAreaStat(gnn_gsrm_t *g, bor_real_t *min, bor_real_t *max,
                          bor_real_t *avg);
 /** Deletes incorrect faces from mesh */
-static void delIncorrectFaces(bor_gsrm_t *g);
+static void delIncorrectFaces(gnn_gsrm_t *g);
 /** Deletes incorrect edges from mesh */
-static void delIncorrectEdges(bor_gsrm_t *g);
+static void delIncorrectEdges(gnn_gsrm_t *g);
 /** Merges all edges that can be merged */
-static void mergeEdges(bor_gsrm_t *g);
+static void mergeEdges(gnn_gsrm_t *g);
 /** Tries to finish (triangulate) surface */
-static void finishSurface(bor_gsrm_t *g);
+static void finishSurface(gnn_gsrm_t *g);
 /** Deletes lonely nodes, edges and faces */
-static void delLonelyNodesEdgesFaces(bor_gsrm_t *g);
+static void delLonelyNodesEdgesFaces(gnn_gsrm_t *g);
 /** Embed triangles everywhere it can */
-static void finishSurfaceEmbedTriangles(bor_gsrm_t *g);
+static void finishSurfaceEmbedTriangles(gnn_gsrm_t *g);
 /** Returns true if all internal angles of face is smaller than
  *  g->params.max_angle */
-static int faceCheckAngle(bor_gsrm_t *g, bor_mesh3_vertex_t *v1,
+static int faceCheckAngle(gnn_gsrm_t *g, bor_mesh3_vertex_t *v1,
                           bor_mesh3_vertex_t *v2, bor_mesh3_vertex_t *v3);
 /** Deletes one of triangles (the triangles are considered to have dihedral
  *  angle smaller than g->params.min_dangle.
  *  First is deleted face that have less incidenting faces. If both have
  *  same, faces with smaller area is deleted. */
-static void delFacesDangle(bor_gsrm_t *g, face_t *f1, face_t *f2);
+static void delFacesDangle(gnn_gsrm_t *g, face_t *f1, face_t *f2);
 /** Returns true if given edge can't be used for face creation */
 static int edgeNotUsable(bor_mesh3_edge_t *e);
 /** Tries to finish triangle incidenting with e.
  *  It's assumend that e has already one incidenting face. */
-static int finishSurfaceTriangle(bor_gsrm_t *g, edge_t *e);
+static int finishSurfaceTriangle(gnn_gsrm_t *g, edge_t *e);
 /** Tries to create completely new face */
-static int finishSurfaceNewFace(bor_gsrm_t *g, edge_t *e);
+static int finishSurfaceNewFace(gnn_gsrm_t *g, edge_t *e);
 
 static int errHeapLT(const bor_pairheap_node_t *_n1,
                      const bor_pairheap_node_t *_n2,
                      void *data);
 
-void borGSRMParamsInit(bor_gsrm_params_t *params)
+void gnnGSRMParamsInit(gnn_gsrm_params_t *params)
 {
     params->lambda = 200;
     params->eb = 0.05;
@@ -241,11 +241,11 @@ void borGSRMParamsInit(bor_gsrm_params_t *params)
     params->unoptimized_err = 0;
 }
 
-bor_gsrm_t *borGSRMNew(const bor_gsrm_params_t *params)
+gnn_gsrm_t *gnnGSRMNew(const gnn_gsrm_params_t *params)
 {
-    bor_gsrm_t *g;
+    gnn_gsrm_t *g;
 
-    g = BOR_ALLOC(bor_gsrm_t);
+    g = BOR_ALLOC(gnn_gsrm_t);
     g->params = *params;
 
     // initialize point cloude (input signals)
@@ -269,7 +269,7 @@ bor_gsrm_t *borGSRMNew(const bor_gsrm_params_t *params)
     return g;
 }
 
-void borGSRMDel(bor_gsrm_t *g)
+void gnnGSRMDel(gnn_gsrm_t *g)
 {
     if (g->c)
         cacheDel(g->c);
@@ -295,12 +295,12 @@ void borGSRMDel(bor_gsrm_t *g)
     BOR_FREE(g);
 }
 
-size_t borGSRMAddInputSignals(bor_gsrm_t *g, const char *fn)
+size_t gnnGSRMAddInputSignals(gnn_gsrm_t *g, const char *fn)
 {
     return borPCAddFromFile(g->is, fn);
 }
 
-int borGSRMRun(bor_gsrm_t *g)
+int gnnGSRMRun(gnn_gsrm_t *g)
 {
     size_t cycle;
 
@@ -319,7 +319,7 @@ int borGSRMRun(bor_gsrm_t *g)
 
         cycle++;
         if (g->params.verbosity >= 2
-                && bor_unlikely(cycle == BOR_GSRM_PROGRESS_REFRESH)){
+                && bor_unlikely(cycle == GNN_GSRM_PROGRESS_REFRESH)){
             PR_PROGRESS(g);
             cycle = 0;
         }
@@ -339,7 +339,7 @@ int borGSRMRun(bor_gsrm_t *g)
 }
 
 
-int borGSRMPostprocess(bor_gsrm_t *g)
+int gnnGSRMPostprocess(gnn_gsrm_t *g)
 {
     bor_real_t min, max, avg;
 
@@ -435,7 +435,7 @@ int borGSRMPostprocess(bor_gsrm_t *g)
 }
 
 
-static int init(bor_gsrm_t *g)
+static int init(gnn_gsrm_t *g)
 {
     size_t i;
     bor_real_t maxbeta;
@@ -509,22 +509,22 @@ static int init(bor_gsrm_t *g)
 
 }
 
-static void adapt(bor_gsrm_t *g)
+static void adapt(gnn_gsrm_t *g)
 {
     drawInputPoint(g);
     echl(g);
 }
 
-static void newNode(bor_gsrm_t *g)
+static void newNode(gnn_gsrm_t *g)
 {
     createNewNode(g);
 }
 
-static bor_gsrm_cache_t *cacheNew(void)
+static gnn_gsrm_cache_t *cacheNew(void)
 {
-    bor_gsrm_cache_t *c;
+    gnn_gsrm_cache_t *c;
 
-    c = BOR_ALLOC(bor_gsrm_cache_t);
+    c = BOR_ALLOC(gnn_gsrm_cache_t);
     c->nearest[0] = c->nearest[1] = NULL;
 
     c->common_neighb_size = 3;
@@ -537,7 +537,7 @@ static bor_gsrm_cache_t *cacheNew(void)
     return c;
 }
 
-static void cacheDel(bor_gsrm_cache_t *c)
+static void cacheDel(gnn_gsrm_cache_t *c)
 {
     BOR_FREE(c->common_neighb);
     BOR_FREE(c);
@@ -546,7 +546,7 @@ static void cacheDel(bor_gsrm_cache_t *c)
 
 
 /** --- Node functions --- **/
-static node_t *nodeNew(bor_gsrm_t *g, const bor_vec3_t *v)
+static node_t *nodeNew(gnn_gsrm_t *g, const bor_vec3_t *v)
 {
     node_t *n;
 
@@ -577,7 +577,7 @@ static node_t *nodeNew(bor_gsrm_t *g, const bor_vec3_t *v)
     return n;
 }
 
-_bor_inline void nodeFixError(bor_gsrm_t *g, node_t *n)
+_bor_inline void nodeFixError(gnn_gsrm_t *g, node_t *n)
 {
     unsigned long diff;
 
@@ -593,21 +593,21 @@ _bor_inline void nodeFixError(bor_gsrm_t *g, node_t *n)
     n->err_cycle = g->cycle;
 }
 
-_bor_inline void nodeIncError(bor_gsrm_t *g, node_t *n, bor_real_t inc)
+_bor_inline void nodeIncError(gnn_gsrm_t *g, node_t *n, bor_real_t inc)
 {
     nodeFixError(g, n);
     n->err += inc;
     borPairHeapUpdate(g->err_heap, &n->err_heap);
 }
 
-_bor_inline void nodeScaleError(bor_gsrm_t *g, node_t *n, bor_real_t scale)
+_bor_inline void nodeScaleError(gnn_gsrm_t *g, node_t *n, bor_real_t scale)
 {
     nodeFixError(g, n);
     n->err *= scale;
     borPairHeapUpdate(g->err_heap, &n->err_heap);
 }
 
-static void nodeDel(bor_gsrm_t *g, node_t *n)
+static void nodeDel(gnn_gsrm_t *g, node_t *n)
 {
     bor_list_t *list, *item, *item_tmp;
     bor_mesh3_edge_t *edge;
@@ -649,7 +649,7 @@ static void nodeDel(bor_gsrm_t *g, node_t *n)
 
 static void nodeDel2(bor_mesh3_vertex_t *v, void *data)
 {
-    bor_gsrm_t *g = (bor_gsrm_t *)data;
+    gnn_gsrm_t *g = (gnn_gsrm_t *)data;
     node_t *n;
     n = bor_container_of(v, node_t, vert);
 
@@ -664,7 +664,7 @@ static void nodeDel2(bor_mesh3_vertex_t *v, void *data)
 
 
 /** --- Edge functions --- **/
-static edge_t *edgeNew(bor_gsrm_t *g, node_t *n1, node_t *n2)
+static edge_t *edgeNew(gnn_gsrm_t *g, node_t *n1, node_t *n2)
 {
     edge_t *e;
 
@@ -678,7 +678,7 @@ static edge_t *edgeNew(bor_gsrm_t *g, node_t *n1, node_t *n2)
     return e;
 }
 
-static void edgeDel(bor_gsrm_t *g, edge_t *e)
+static void edgeDel(gnn_gsrm_t *g, edge_t *e)
 {
     bor_mesh3_face_t *face;
     int res;
@@ -709,7 +709,7 @@ static void edgeDel2(bor_mesh3_edge_t *edge, void *data)
 
 
 /** --- Face functions --- **/
-static face_t *faceNew(bor_gsrm_t *g, edge_t *e, node_t *n)
+static face_t *faceNew(gnn_gsrm_t *g, edge_t *e, node_t *n)
 {
     face_t *f;
     bor_mesh3_edge_t *e2, *e3;
@@ -736,7 +736,7 @@ static face_t *faceNew(bor_gsrm_t *g, edge_t *e, node_t *n)
     return f;
 }
 
-static void faceDel(bor_gsrm_t *g, face_t *f)
+static void faceDel(gnn_gsrm_t *g, face_t *f)
 {
     borMesh3RemoveFace(g->mesh, &f->face);
     BOR_FREE(f);
@@ -752,7 +752,7 @@ static void faceDel2(bor_mesh3_face_t *face, void *data)
 
 
 
-static void meshInit(bor_gsrm_t *g)
+static void meshInit(gnn_gsrm_t *g)
 {
     bor_vec3_t *v;
     size_t i;
@@ -769,7 +769,7 @@ static void meshInit(bor_gsrm_t *g)
     }
 }
 
-static void drawInputPoint(bor_gsrm_t *g)
+static void drawInputPoint(gnn_gsrm_t *g)
 {
     if (borPCItEnd(&g->isit)){
         // if iterator is at the end permutate point cloud again
@@ -784,7 +784,7 @@ static void drawInputPoint(bor_gsrm_t *g)
 
 
 /** --- ECHL functions --- **/
-static void decreaseAllErrors(bor_gsrm_t *g)
+static void decreaseAllErrors(gnn_gsrm_t *g)
 {
     bor_list_t *list, *item;
     bor_mesh3_vertex_t *v;
@@ -799,7 +799,7 @@ static void decreaseAllErrors(bor_gsrm_t *g)
 }
 
 
-static void echl(bor_gsrm_t *g)
+static void echl(gnn_gsrm_t *g)
 {
     bor_nn_el_t *el[2];
 
@@ -822,7 +822,7 @@ static void echl(bor_gsrm_t *g)
     }
 }
 
-static void echlCommonNeighbors(bor_gsrm_t *g, node_t *n1, node_t *n2)
+static void echlCommonNeighbors(gnn_gsrm_t *g, node_t *n1, node_t *n2)
 {
     bor_list_t *list1, *list2;
     bor_list_t *item1, *item2;
@@ -867,7 +867,7 @@ static void echlCommonNeighbors(bor_gsrm_t *g, node_t *n1, node_t *n2)
     g->c->common_neighb_len = len;
 }
 
-static void echlRemoveThales(bor_gsrm_t *g, edge_t *e, node_t *n1, node_t *n2)
+static void echlRemoveThales(gnn_gsrm_t *g, edge_t *e, node_t *n1, node_t *n2)
 {
     node_t *nb;
     size_t i, len;
@@ -884,7 +884,7 @@ static void echlRemoveThales(bor_gsrm_t *g, edge_t *e, node_t *n1, node_t *n2)
     }
 }
 
-static void echlRemoveNeighborsEdges(bor_gsrm_t *g)
+static void echlRemoveNeighborsEdges(gnn_gsrm_t *g)
 {
     size_t i, j, len;
     bor_mesh3_edge_t *edge;
@@ -907,7 +907,7 @@ static void echlRemoveNeighborsEdges(bor_gsrm_t *g)
     }
 }
 
-static void echlCreateFaces(bor_gsrm_t *g, edge_t *e)
+static void echlCreateFaces(gnn_gsrm_t *g, edge_t *e)
 {
     size_t i, len;
     node_t **ns;
@@ -919,7 +919,7 @@ static void echlCreateFaces(bor_gsrm_t *g, edge_t *e)
     }
 }
 
-static void echlConnectNodes(bor_gsrm_t *g)
+static void echlConnectNodes(gnn_gsrm_t *g)
 {
     bor_mesh3_edge_t *edge;
     edge_t *e;
@@ -960,7 +960,7 @@ static void echlConnectNodes(bor_gsrm_t *g)
     }
 }
 
-_bor_inline void echlMoveNode(bor_gsrm_t *g, node_t *n, bor_real_t k)
+_bor_inline void echlMoveNode(gnn_gsrm_t *g, node_t *n, bor_real_t k)
 {
     bor_vec3_t v;
 
@@ -975,7 +975,7 @@ _bor_inline void echlMoveNode(bor_gsrm_t *g, node_t *n, bor_real_t k)
     borNNUpdate(g->nn, &n->nn);
 }
 
-static void echlMove(bor_gsrm_t *g)
+static void echlMove(gnn_gsrm_t *g)
 {
     bor_list_t *list, *item;
     bor_mesh3_edge_t *edge;
@@ -1008,7 +1008,7 @@ static void echlMove(bor_gsrm_t *g)
     }
 }
 
-static void echlUpdate(bor_gsrm_t *g)
+static void echlUpdate(gnn_gsrm_t *g)
 {
     node_t *wn;
     edge_t *e;
@@ -1052,7 +1052,7 @@ static void echlUpdate(bor_gsrm_t *g)
 
 
 /** --- Create New Node functions --- **/
-static node_t *nodeWithHighestErrCounterLinear(bor_gsrm_t *g)
+static node_t *nodeWithHighestErrCounterLinear(gnn_gsrm_t *g)
 {
     bor_list_t *list, *item;
     bor_mesh3_vertex_t *v;
@@ -1077,7 +1077,7 @@ static node_t *nodeWithHighestErrCounterLinear(bor_gsrm_t *g)
     return max;
 }
 
-static node_t *nodeWithHighestErrCounter(bor_gsrm_t *g)
+static node_t *nodeWithHighestErrCounter(gnn_gsrm_t *g)
 {
     bor_pairheap_node_t *max;
     node_t *maxn;
@@ -1092,7 +1092,7 @@ static node_t *nodeWithHighestErrCounter(bor_gsrm_t *g)
     return maxn;
 }
 
-static node_t *nodesNeighborWithHighestErrCounter(bor_gsrm_t *g, node_t *sq)
+static node_t *nodesNeighborWithHighestErrCounter(gnn_gsrm_t *g, node_t *sq)
 {
     bor_list_t *list, *item;
     bor_mesh3_edge_t *edge;
@@ -1122,7 +1122,7 @@ static node_t *nodesNeighborWithHighestErrCounter(bor_gsrm_t *g, node_t *sq)
     return max_n;
 }
 
-static node_t *createNewNode2(bor_gsrm_t *g, node_t *sq, node_t *sf)
+static node_t *createNewNode2(gnn_gsrm_t *g, node_t *sq, node_t *sf)
 {
     node_t *sr;
     bor_vec3_t v;
@@ -1135,7 +1135,7 @@ static node_t *createNewNode2(bor_gsrm_t *g, node_t *sq, node_t *sf)
     return sr;
 }
 
-static void createNewNode(bor_gsrm_t *g)
+static void createNewNode(gnn_gsrm_t *g)
 {
     node_t *sq, *sf, *sr;
     bor_mesh3_edge_t *edge;
@@ -1186,7 +1186,7 @@ static void createNewNode(bor_gsrm_t *g)
 
 
 /** --- Topology learning --- */
-static void learnTopology(bor_gsrm_t *g)
+static void learnTopology(gnn_gsrm_t *g)
 {
     bor_vec_t *is;
     bor_pc_it_t pcit;
@@ -1210,7 +1210,7 @@ static void learnTopology(bor_gsrm_t *g)
 }
 
 /** --- Postprocessing functions --- */
-static void faceAreaStat(bor_gsrm_t *g, bor_real_t *_min, bor_real_t *_max,
+static void faceAreaStat(gnn_gsrm_t *g, bor_real_t *_min, bor_real_t *_max,
                          bor_real_t *_avg)
 {
     bor_real_t area, min, max, avg;
@@ -1242,7 +1242,7 @@ static void faceAreaStat(bor_gsrm_t *g, bor_real_t *_min, bor_real_t *_max,
     *_avg = avg;
 }
 
-static void delIncorrectFaces(bor_gsrm_t *g)
+static void delIncorrectFaces(gnn_gsrm_t *g)
 {
     bor_mesh3_vertex_t *vs[4];
     bor_list_t *list, *item, *item_tmp;
@@ -1294,7 +1294,7 @@ static void delIncorrectFaces(bor_gsrm_t *g)
     }
 }
 
-static void delIncorrectEdges(bor_gsrm_t *g)
+static void delIncorrectEdges(gnn_gsrm_t *g)
 {
     int madechange;
     bor_list_t *list, *item, *item_tmp;
@@ -1323,7 +1323,7 @@ static void delIncorrectEdges(bor_gsrm_t *g)
     }
 }
 
-static void mergeEdges(bor_gsrm_t *g)
+static void mergeEdges(gnn_gsrm_t *g)
 {
     int madechange;
     bor_list_t *list, *item, *item_tmp, *list2;
@@ -1383,7 +1383,7 @@ static void mergeEdges(bor_gsrm_t *g)
     }
 }
 
-static void finishSurface(bor_gsrm_t *g)
+static void finishSurface(gnn_gsrm_t *g)
 {
     int madechange;
     bor_list_t *list, *item;
@@ -1415,7 +1415,7 @@ static void finishSurface(bor_gsrm_t *g)
     }
 }
 
-static void delLonelyNodesEdgesFaces(bor_gsrm_t *g)
+static void delLonelyNodesEdgesFaces(gnn_gsrm_t *g)
 {
     bor_list_t *list, *item, *item_tmp;
     bor_mesh3_face_t *face;
@@ -1463,7 +1463,7 @@ static void delLonelyNodesEdgesFaces(bor_gsrm_t *g)
     }
 }
 
-static void finishSurfaceEmbedTriangles(bor_gsrm_t *g)
+static void finishSurfaceEmbedTriangles(gnn_gsrm_t *g)
 {
     bor_list_t *list, *item;
     bor_mesh3_edge_t *es[3];
@@ -1501,7 +1501,7 @@ static void finishSurfaceEmbedTriangles(bor_gsrm_t *g)
     }
 }
 
-static int faceCheckAngle(bor_gsrm_t *g, bor_mesh3_vertex_t *v1,
+static int faceCheckAngle(gnn_gsrm_t *g, bor_mesh3_vertex_t *v1,
                           bor_mesh3_vertex_t *v2, bor_mesh3_vertex_t *v3)
 {
     if (borVec3Angle(v1->v, v2->v, v3->v) > g->params.max_angle
@@ -1511,7 +1511,7 @@ static int faceCheckAngle(bor_gsrm_t *g, bor_mesh3_vertex_t *v1,
     return 1;
 }
 
-static void delFacesDangle(bor_gsrm_t *g, face_t *f1, face_t *f2)
+static void delFacesDangle(gnn_gsrm_t *g, face_t *f1, face_t *f2)
 {
     int f1_neighbors, f2_neighbors;
     size_t i;
@@ -1563,7 +1563,7 @@ static int edgeNotUsable(bor_mesh3_edge_t *e)
     return 0;
 }
 
-static int finishSurfaceTriangle(bor_gsrm_t *g, edge_t *e)
+static int finishSurfaceTriangle(gnn_gsrm_t *g, edge_t *e)
 {
     size_t i;
     int ret;
@@ -1653,7 +1653,7 @@ static edge_t *finishSurfaceGetEdge(edge_t *e, node_t *n)
     return s2;
 }
 
-static int finishSurfaceNewFace(bor_gsrm_t *g, edge_t *e)
+static int finishSurfaceNewFace(gnn_gsrm_t *g, edge_t *e)
 {
     bor_mesh3_edge_t *edge;
     bor_mesh3_vertex_t *vs[2];
@@ -1745,7 +1745,7 @@ static int errHeapLT(const bor_pairheap_node_t *_n1,
                      const bor_pairheap_node_t *_n2,
                      void *data)
 {
-    bor_gsrm_t *g = (bor_gsrm_t *)data;
+    gnn_gsrm_t *g = (gnn_gsrm_t *)data;
     node_t *n1, *n2;
 
     n1 = bor_container_of(_n1, node_t, err_heap);

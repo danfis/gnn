@@ -27,11 +27,11 @@
 extern "C" {
 #endif /* __cplusplus */
 
-struct _bor_gsrm_cache_t;
+struct _gnn_gsrm_cache_t;
 
 /** How often progress should be printed - it will be _approximately_
- *  every BOR_GSRM_PROGRESS_REFRESH'th new node. */
-#define BOR_GSRM_PROGRESS_REFRESH 1000
+ *  every GNN_GSRM_PROGRESS_REFRESH'th new node. */
+#define GNN_GSRM_PROGRESS_REFRESH 1000
 
 /**
  * GSRM
@@ -41,7 +41,7 @@ struct _bor_gsrm_cache_t;
  */
 
 /** vvvv */
-struct _bor_gsrm_params_t {
+struct _gnn_gsrm_params_t {
     size_t lambda;    /*!< Number of steps between adding nodes */
     bor_real_t eb;    /*!< Winner node learning rate */
     bor_real_t en;    /*!< Winners' neighbor learning rate */
@@ -64,15 +64,15 @@ struct _bor_gsrm_params_t {
     int unoptimized_err; /*!< True if unoptimized error handling should be
                               used. Default: false */
 };
-typedef struct _bor_gsrm_params_t bor_gsrm_params_t;
+typedef struct _gnn_gsrm_params_t gnn_gsrm_params_t;
 
 /**
  * Initializes parameters of GSRM to default values.
  */
-void borGSRMParamsInit(bor_gsrm_params_t *params);
+void gnnGSRMParamsInit(gnn_gsrm_params_t *params);
 
-struct _bor_gsrm_t {
-    bor_gsrm_params_t params; /*!< Parameters of algorithm */
+struct _gnn_gsrm_t {
+    gnn_gsrm_params_t params; /*!< Parameters of algorithm */
 
     bor_pc_t *is;      /*!< Input signals */
     bor_pc_it_t isit;  /*!< Iterator over is */
@@ -90,59 +90,59 @@ struct _bor_gsrm_t {
 
     bor_timer_t timer;
 
-    struct _bor_gsrm_cache_t *c; /*!< Internal cache, don't touch it! */
+    struct _gnn_gsrm_cache_t *c; /*!< Internal cache, don't touch it! */
 };
-typedef struct _bor_gsrm_t bor_gsrm_t;
+typedef struct _gnn_gsrm_t gnn_gsrm_t;
 /** ^^^^ */
 
 
 /**
  * Allocates core struct and initializes to default values.
  */
-bor_gsrm_t *borGSRMNew(const bor_gsrm_params_t *params);
+gnn_gsrm_t *gnnGSRMNew(const gnn_gsrm_params_t *params);
 
 /**
  * Deallocates struct.
  */
-void borGSRMDel(bor_gsrm_t *g);
+void gnnGSRMDel(gnn_gsrm_t *g);
 
 /**
  * Adds input signals from given file.
  * Returns number of read points.
  */
-size_t borGSRMAddInputSignals(bor_gsrm_t *g, const char *fn);
+size_t gnnGSRMAddInputSignals(gnn_gsrm_t *g, const char *fn);
 
 /**
  * Runs GSRM algorithm.
  * Returns 0 on success.
  * Returns -1 if no there are no input signals.
  */
-int borGSRMRun(bor_gsrm_t *g);
+int gnnGSRMRun(gnn_gsrm_t *g);
 
 /**
  * Performs postprocessing of mesh.
- * This function should be called _after_ borGSRMRun().
+ * This function should be called _after_ gnnGSRMRun().
  */
-int borGSRMPostprocess(bor_gsrm_t *g);
+int gnnGSRMPostprocess(gnn_gsrm_t *g);
 
 /**
  * Return struct with GSRM parameters.
  */
-_bor_inline const bor_gsrm_params_t *borGSRMParams(bor_gsrm_t *g);
+_bor_inline const gnn_gsrm_params_t *gnnGSRMParams(gnn_gsrm_t *g);
 
 /**
  * Returns pointer to mesh.
  */
-_bor_inline bor_mesh3_t *borGSRMMesh(bor_gsrm_t *g);
+_bor_inline bor_mesh3_t *gnnGSRMMesh(gnn_gsrm_t *g);
 
 
 /**** INLINES ****/
-_bor_inline const bor_gsrm_params_t *borGSRMParams(bor_gsrm_t *g)
+_bor_inline const gnn_gsrm_params_t *gnnGSRMParams(gnn_gsrm_t *g)
 {
     return &g->params;
 }
 
-_bor_inline bor_mesh3_t *borGSRMMesh(bor_gsrm_t *g)
+_bor_inline bor_mesh3_t *gnnGSRMMesh(gnn_gsrm_t *g)
 {
     return g->mesh;
 }
