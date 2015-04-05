@@ -115,7 +115,7 @@ size_t gnnGSRMAddInputSignals(gnn_gsrm_t *g, const char *fn);
 /**
  * Runs GSRM algorithm.
  * Returns 0 on success.
- * Returns -1 if no there are no input signals.
+ * Returns -1 if there are no input signals.
  */
 int gnnGSRMRun(gnn_gsrm_t *g);
 
