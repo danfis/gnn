@@ -1,9 +1,9 @@
 /***
- * fermat
- * -------
- * Copyright (c)2011 Daniel Fiser <danfis@danfis.cz>
+ * GNN
+ * ----
+ * Copyright (c)2015 Daniel Fiser <danfis@danfis.cz>
  *
- *  This file is part of fermat.
+ *  This file is part of GNN.
  *
  *  Distributed under the OSI-approved BSD License (the "License");
  *  see accompanying file BDS-LICENSE for details or see
@@ -14,14 +14,21 @@
  *  See the License for more information.
  */
 
-#include <fermat/opts.h>
-#include <fermat/gsrm.h>
-#include <fermat/parse.h>
+
+#include <opts.h>
+#include <boruvka/parse.h>
+#include <gnn/gsrm.h>
+
+#ifdef BOR_SINGLE
+# define OPTS_REAL OPTS_FLOAT
+#else /* BOR_SINGLE */
+# define OPTS_REAL OPTS_DOUBLE
+#endif /* BOR_SINGLE */
 
 
 #define DUMP_TRIANGLES_FN_LEN 100
-static fer_gsrm_params_t params;
-static fer_gsrm_t *gsrm;
+static bor_gsrm_params_t params;
+static bor_gsrm_t *gsrm;
 static const char *is_fn = NULL;
 static const char *outfile_fn;
 static FILE *dump_triangles = NULL;
@@ -37,14 +44,14 @@ static void printAttrs(void);
 
 int main(int argc, char *argv[])
 {
-    fer_mesh3_t *mesh;
+    bor_mesh3_t *mesh;
     size_t islen;
     FILE *outfile;
-    fer_timer_t timer;
+    bor_timer_t timer;
 
     readOptions(argc, argv);
 
-    gsrm = ferGSRMNew(&params);
+    gsrm = borGSRMNew(&params);
 
     printAttrs();
 
@@ -59,41 +66,41 @@ int main(int argc, char *argv[])
         }
     }
 
-    ferTimerStart(&timer);
-    ferTimerStopAndPrintElapsed(&timer, stderr, " Reading input signals:\n");
-    ferTimerStopAndPrintElapsed(&timer, stderr, "   -- '%s'...\n", is_fn);
-    islen = ferGSRMAddInputSignals(gsrm, is_fn);
-    ferTimerStopAndPrintElapsed(&timer, stderr, "     --  Added %d input signals.\n", islen);
+    borTimerStart(&timer);
+    borTimerStopAndPrintElapsed(&timer, stderr, " Reading input signals:\n");
+    borTimerStopAndPrintElapsed(&timer, stderr, "   -- '%s'...\n", is_fn);
+    islen = borGSRMAddInputSignals(gsrm, is_fn);
+    borTimerStopAndPrintElapsed(&timer, stderr, "     --  Added %d input signals.\n", islen);
     fprintf(stderr, "\n");
 
-    if (ferGSRMRun(gsrm) == 0){
+    if (borGSRMRun(gsrm) == 0){
         if (!no_postprocess)
-            ferGSRMPostprocess(gsrm);
+            borGSRMPostprocess(gsrm);
 
-        ferTimerStart(&timer);
+        borTimerStart(&timer);
 
-        mesh = ferGSRMMesh(gsrm);
-        ferMesh3DumpSVT(mesh, outfile, "Result");
+        mesh = borGSRMMesh(gsrm);
+        borMesh3DumpSVT(mesh, outfile, "Result");
 
         if (params.verbosity >= 2){
             fprintf(stderr, "\n");
-            ferTimerStopAndPrintElapsed(&timer, stderr, " Mesh dumped to '%s'.\n",
+            borTimerStopAndPrintElapsed(&timer, stderr, " Mesh dumped to '%s'.\n",
                                         (outfile == stdout ? "stdout" : outfile_fn));
         }
 
         if (dump_triangles != NULL){
-            ferMesh3DumpTriangles(mesh, dump_triangles);
+            borMesh3DumpTriangles(mesh, dump_triangles);
             fclose(dump_triangles);
 
             if (params.verbosity >= 2){
-                ferTimerStopAndPrintElapsed(&timer, stderr,
+                borTimerStopAndPrintElapsed(&timer, stderr,
                                             " Mesh dumped as triangles into '%s'.\n",
                                             dump_triangles_fn);
             }
         }
     }
 
-    ferGSRMDel(gsrm);
+    borGSRMDel(gsrm);
 
 
     // close output file
@@ -124,11 +131,11 @@ static void optDumpTriangles(const char *l, char s, const char *val)
 static void optNN(const char *l, char s)
 {
     if (strcmp(l, "nn-gug") == 0){
-        params.nn.type = FER_NN_GUG;
+        params.nn.type = BOR_NN_GUG;
     }else if (strcmp(l, "nn-vptree") == 0){
-        params.nn.type = FER_NN_VPTREE;
+        params.nn.type = BOR_NN_VPTREE;
     }else if (strcmp(l, "nn-linear") == 0){
-        params.nn.type = FER_NN_LINEAR;
+        params.nn.type = BOR_NN_LINEAR;
     }
 }
 
@@ -148,36 +155,36 @@ static void readOptions(int argc, char *argv[])
     pargc = argc;
     pargv = argv;
 
-    ferGSRMParamsInit(&params);
+    borGSRMParamsInit(&params);
     params.verbosity = 1;
     params.nn.gug.num_cells = 0;
     params.nn.gug.max_dens = 0.1;
     params.nn.gug.expand_rate = 1.5;
 
-    ferOptsAdd("help",             'h', FER_OPTS_NONE,  NULL, FER_OPTS_CB(optHelp));
-    ferOptsAdd("verbose",          'v', FER_OPTS_NONE,  NULL, FER_OPTS_CB(optIncVerbosity));
-    ferOptsAdd("epsilon-n",         0, FER_OPTS_REAL,   (void *)&params.en, NULL);
-    ferOptsAdd("epsilon-b",         0, FER_OPTS_REAL,   (void *)&params.eb, NULL);
-    ferOptsAdd("lambda",            0, FER_OPTS_SIZE_T, (void *)&params.lambda, NULL);
-    ferOptsAdd("beta",              0, FER_OPTS_REAL,   (void *)&params.beta, NULL);
-    ferOptsAdd("alpha",             0, FER_OPTS_REAL,   (void *)&params.alpha, NULL);
-    ferOptsAdd("age-max",           0, FER_OPTS_INT,    (void *)&params.age_max, NULL);
-    ferOptsAdd("max-nodes",         0, FER_OPTS_SIZE_T, (void *)&params.max_nodes, NULL);
-    ferOptsAdd("min-dangle",        0, FER_OPTS_REAL,   (void *)&params.min_dangle, NULL);
-    ferOptsAdd("max-angle",         0, FER_OPTS_REAL,   (void *)&params.max_angle, NULL);
-    ferOptsAdd("angle-merge-edges", 0, FER_OPTS_REAL,   (void *)&params.angle_merge_edges, NULL);
-    ferOptsAdd("dump-triangles",    0, FER_OPTS_STR,    NULL, FER_OPTS_CB(optDumpTriangles));
-    ferOptsAdd("nn-gug",            0, FER_OPTS_NONE,   NULL, FER_OPTS_CB(optNN));
-    ferOptsAdd("nn-vptree",         0, FER_OPTS_NONE,   NULL, FER_OPTS_CB(optNN));
-    ferOptsAdd("nn-linear",         0, FER_OPTS_NONE,   NULL, FER_OPTS_CB(optNN));
-    ferOptsAdd("vptree-max-size",   0, FER_OPTS_INT,    (void *)&params.nn.vptree.maxsize, NULL);
-    ferOptsAdd("gug-max-dens",      0, FER_OPTS_REAL,   (void *)&params.nn.gug.max_dens, NULL);
-    ferOptsAdd("gug-expand-rate",   0, FER_OPTS_REAL,   (void *)&params.nn.gug.expand_rate, NULL);
-    ferOptsAdd("unoptimized-err",   0, FER_OPTS_NONE,   (void *)&params.unoptimized_err, NULL);
-    ferOptsAdd("no-postprocess",    0, FER_OPTS_NONE,   (void *)&no_postprocess, NULL);
-    ferOptsAdd("output",           'o', FER_OPTS_STR,   NULL, FER_OPTS_CB(optOutput));
+    optsAdd("help",             'h', OPTS_NONE,  NULL, OPTS_CB(optHelp));
+    optsAdd("verbose",          'v', OPTS_NONE,  NULL, OPTS_CB(optIncVerbosity));
+    optsAdd("epsilon-n",         0, OPTS_REAL,   (void *)&params.en, NULL);
+    optsAdd("epsilon-b",         0, OPTS_REAL,   (void *)&params.eb, NULL);
+    optsAdd("lambda",            0, OPTS_SIZE_T, (void *)&params.lambda, NULL);
+    optsAdd("beta",              0, OPTS_REAL,   (void *)&params.beta, NULL);
+    optsAdd("alpha",             0, OPTS_REAL,   (void *)&params.alpha, NULL);
+    optsAdd("age-max",           0, OPTS_INT,    (void *)&params.age_max, NULL);
+    optsAdd("max-nodes",         0, OPTS_SIZE_T, (void *)&params.max_nodes, NULL);
+    optsAdd("min-dangle",        0, OPTS_REAL,   (void *)&params.min_dangle, NULL);
+    optsAdd("max-angle",         0, OPTS_REAL,   (void *)&params.max_angle, NULL);
+    optsAdd("angle-merge-edges", 0, OPTS_REAL,   (void *)&params.angle_merge_edges, NULL);
+    optsAdd("dump-triangles",    0, OPTS_STR,    NULL, OPTS_CB(optDumpTriangles));
+    optsAdd("nn-gug",            0, OPTS_NONE,   NULL, OPTS_CB(optNN));
+    optsAdd("nn-vptree",         0, OPTS_NONE,   NULL, OPTS_CB(optNN));
+    optsAdd("nn-linear",         0, OPTS_NONE,   NULL, OPTS_CB(optNN));
+    optsAdd("vptree-max-size",   0, OPTS_INT,    (void *)&params.nn.vptree.maxsize, NULL);
+    optsAdd("gug-max-dens",      0, OPTS_REAL,   (void *)&params.nn.gug.max_dens, NULL);
+    optsAdd("gug-expand-rate",   0, OPTS_REAL,   (void *)&params.nn.gug.expand_rate, NULL);
+    optsAdd("unoptimized-err",   0, OPTS_NONE,   (void *)&params.unoptimized_err, NULL);
+    optsAdd("no-postprocess",    0, OPTS_NONE,   (void *)&no_postprocess, NULL);
+    optsAdd("output",           'o', OPTS_STR,   NULL, OPTS_CB(optOutput));
 
-    if (ferOpts(&argc, argv) != 0){
+    if (opts(&argc, argv) != 0){
         usage(argc, argv, NULL);
     }
 
@@ -238,9 +245,9 @@ static void usage(int argc, char *argv[], const char *opt_msg)
 
 void printAttrs(void)
 {
-    const fer_gsrm_params_t *param;
+    const bor_gsrm_params_t *param;
 
-    param = ferGSRMParams(gsrm);
+    param = borGSRMParams(gsrm);
 
     fprintf(stderr, "Attributes:\n");
     fprintf(stderr, "    lambda:    %d\n", (int)param->lambda);

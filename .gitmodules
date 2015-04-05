@@ -1,0 +1,6 @@
+[submodule "third-party/boruvka"]
+	path = third-party/boruvka
+	url = https://github.com/danfis/boruvka
+[submodule "third-party/opts"]
+	path = third-party/opts
+	url = https://github.com/danfis/opts

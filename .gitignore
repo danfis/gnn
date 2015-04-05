@@ -8,3 +8,4 @@ Makefile.local
 __pycache__
 *.pyc
 *.pyo
+bin/gnn-gsrm

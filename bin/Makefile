@@ -4,31 +4,23 @@
 CFLAGS += -I../
 CFLAGS += $(BORUVKA_CFLAGS)
 CFLAGS += $(OPTS_CFLAGS)
-CFLAGS += $(PROTOBUF_CFLAGS)
-CFLAGS += $(NANOMSG_CFLAGS)
-LDFLAGS += -L../ -lplan
+LDFLAGS += -L../ -lgnn
 LDFLAGS += $(BORUVKA_LDFLAGS)
 LDFLAGS += $(OPTS_LDFLAGS)
-LDFLAGS += $(PROTOBUF_LDFLAGS)
-LDFLAGS += $(NANOMSG_LDFLAGS)
 LDFLAGS += -pthread -lrt -lm
-LDFLAGS += -lstdc++
 
 ifeq '$(BIN_STATIC)' 'yes'
   LDFLAGS += -static
 endif
 
-OBJS  = search.o
-OBJS += options.o
+OBJS =
 
-TARGETS = search
+TARGETS = gnn-gsrm
 
 all: $(TARGETS)
 
-search: ../libplan.a $(OBJS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDFLAGS)
-ma-search: ma-search.c ../libplan.a
-	$(CC) $(CFLAGS) -o $@ $< $(LDFLAGS)
+gnn-%: %.c ../libgnn.a 
+	$(CC) $(CFLAGS) -o $@ $< $(OBJS) $(LDFLAGS)
 
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c -o $@ $<
