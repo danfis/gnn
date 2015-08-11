@@ -15,7 +15,7 @@ endif
 
 OBJS =
 
-TARGETS = gnn-gsrm
+TARGETS = gnn-gsrm gnn-gng-t
 
 all: $(TARGETS)
 

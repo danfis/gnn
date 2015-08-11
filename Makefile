@@ -23,6 +23,7 @@ CFLAGS += $(OPTS_CFLAGS)
 TARGETS  = libgnn.a
 
 OBJS  = gsrm
+OBJS += gng-t
 
 OBJS := $(foreach obj,$(OBJS),.objs/$(obj).o)
 
